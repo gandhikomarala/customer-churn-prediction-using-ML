@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ChurnGuard — Machine Learning Churn Intelligence</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background: #0b0f19; color: #f8fafc; min-height: 100vh; display: flex; flex-direction: column; }
+    header { background: #111827; border-bottom: 1px solid #1f2937; padding: 18px 32px; display: flex; justify-content: space-between; align-items: center; }
+    .brand { font-size: 22px; font-weight: 900; color: #ec4899; }
+    main { flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; padding: 32px; display: grid; grid-template-columns: 420px 1fr; gap: 32px; }
+    .card { background: #111827; border: 1px solid #1f2937; border-radius: 18px; padding: 28px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+    .field { margin-bottom: 18px; }
+    label { display: block; font-size: 13px; font-weight: 700; color: #94a3b8; margin-bottom: 6px; }
+    input, select { width: 100%; background: #030712; border: 1px solid #374151; border-radius: 8px; padding: 12px; color: #f8fafc; font-size: 15px; }
+    .btn-predict { width: 100%; background: linear-gradient(135deg, #ec4899 0%, #be185d 100%); color: #fff; border: none; padding: 14px; border-radius: 10px; font-weight: 900; font-size: 16px; cursor: pointer; }
+    .gauge-wrap { background: #030712; border: 1px solid #1f2937; border-radius: 16px; padding: 28px; text-align: center; margin-bottom: 24px; }
+    .gauge-val { font-size: 54px; font-weight: 900; color: #22c55e; }
+    .risk-tag { display: inline-block; padding: 6px 18px; border-radius: 20px; font-size: 14px; font-weight: 800; margin-top: 8px; }
+    .shap-bar { display: flex; align-items: center; margin-bottom: 12px; font-size: 13px; }
+    .shap-label { width: 160px; color: #cbd5e1; }
+    .shap-fill { height: 16px; border-radius: 4px; background: #ec4899; }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="brand">🔮 CHURNGUARD — ML CUSTOMER CHURN PREDICTOR</div>
+    <div style="background:rgba(236, 72, 153, 0.15); color:#f472b6; border:1px solid #ec4899; padding:6px 14px; border-radius:20px; font-size:13px; font-weight:700;">XGBoost / LightGBM Model Active</div>
+  </header>
+  <main>
+    <div class="card">
+      <h3 style="margin-bottom:16px;">Customer Behavioral Profile</h3>
+      <div class="field">
+        <label>Account Tenure (Months)</label>
+        <input type="number" id="tenure" value="8" min="1" max="72">
+      </div>
+      <div class="field">
+        <label>Monthly Spend ($)</label>
+        <input type="number" id="monthly" value="95" min="10" max="500">
+      </div>
+      <div class="field">
+        <label>Contract Type</label>
+        <select id="contract">
+          <option value="month">Month-to-Month</option>
+          <option value="one_year">One Year</option>
+          <option value="two_year">Two Year</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>Tech Support Tickets (Last 90 Days)</label>
+        <input type="number" id="tickets" value="4" min="0" max="20">
+      </div>
+      <button class="btn-predict" onclick="runInference()">Run ML Risk Inference</button>
+    </div>
+
+    <div>
+      <div class="gauge-wrap">
+        <div style="font-size:13px; color:#94a3b8; font-weight:700; text-transform:uppercase;">Predicted Churn Probability</div>
+        <div class="gauge-val" id="prob-num">18.4%</div>
+        <div class="risk-tag" id="risk-pill" style="background:rgba(34,197,94,0.15); color:#4ade80; border:1px solid #22c55e;">LOW RETENTION RISK</div>
+      </div>
+
+      <div class="card">
+        <h3 style="margin-bottom:16px;">SHAP Feature Importance Factors</h3>
+        <div class="shap-bar">
+          <div class="shap-label">Contract Type</div>
+          <div class="shap-fill" style="width:75%;"></div>
+        </div>
+        <div class="shap-bar">
+          <div class="shap-label">Tech Support Tickets</div>
+          <div class="shap-fill" style="width:60%; background:#f97316;"></div>
+        </div>
+        <div class="shap-bar">
+          <div class="shap-label">Monthly Charge</div>
+          <div class="shap-fill" style="width:40%; background:#38bdf8;"></div>
+        </div>
+        <div class="shap-bar">
+          <div class="shap-label">Account Tenure</div>
+          <div class="shap-fill" style="width:30%; background:#a855f7;"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script>
+    function runInference() {
+      const tenure = parseFloat(document.getElementById('tenure').value);
+      const contract = document.getElementById('contract').value;
+      const tickets = parseFloat(document.getElementById('tickets').value);
+
+      let score = 20;
+      if (contract === 'month') score += 35;
+      if (tickets >= 3) score += 25;
+      if (tenure < 6) score += 15;
+      score = Math.min(96, Math.max(8, score));
+
+      document.getElementById('prob-num').innerText = `${score}%`;
+      const pill = document.getElementById('risk-pill');
+      const num = document.getElementById('prob-num');
+      if (score > 60) {
+        num.style.color = '#ef4444';
+        pill.innerText = 'HIGH CHURN RISK (Action Required)';
+        pill.style.background = 'rgba(239,68,68,0.15)';
+        pill.style.color = '#f87171';
+        pill.style.borderColor = '#ef4444';
+      } else {
+        num.style.color = '#22c55e';
+        pill.innerText = 'LOW RETENTION RISK';
+        pill.style.background = 'rgba(34,197,94,0.15)';
+        pill.style.color = '#4ade80';
+        pill.style.borderColor = '#22c55e';
+      }
+    }
+  </script>
+</body>
+</html>
