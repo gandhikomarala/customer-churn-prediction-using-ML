@@ -17,7 +17,7 @@ ChurnGuard ML — Customer Retention & Predictive LTV Engine is a production-gra
 
 ### 1. Set Up Python Virtual Environment
 ```bash
-git clone gandhikomarala/customer-churn-prediction-using-ML.git
+git clone git@github.com:gandhikomarala/customer-churn-prediction-using-ML.git
 cd customer_churn_repo
 python -m venv venv
 # Windows:
