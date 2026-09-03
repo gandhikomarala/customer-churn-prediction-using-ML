@@ -1,7 +1,8 @@
-FROM python:3.11-slim
+# Production Dockerfile for customer_churn_repo
+FROM node:20-alpine
 WORKDIR /app
-COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+COPY package*.json ./
+RUN npm install --omit=dev
 COPY . .
-EXPOSE 8000
-CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
+EXPOSE 3000
+CMD ["node", "server.js"]
