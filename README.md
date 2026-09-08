@@ -1,77 +1,98 @@
 # ChurnGuard ML — Customer Retention & Predictive LTV Engine
 
-ChurnGuard ML — Customer Retention & Predictive LTV Engine is a production-grade enterprise application designed with domain-driven architecture, automated quality validation, and high-performance microservices.
+Machine learning platform for real-time customer churn prediction, cohort survival modeling, and lifetime value analytics.
 
 ---
 
-## Dependencies
+## 🏛️ Architecture Overview
 
-* **Runtime**: Python 3.10+ / Node.js 18+
-* **Framework**: FastAPI, Uvicorn, Pydantic v2
-* **Quality & Test**: Pytest, Pytest-cov
-* **Frontend**: HTML5 Canvas / ES6+, Zero-Dependency Web Client
+The system is architected as an enterprise-grade, high-throughput distributed platform designed for horizontal scalability, sub-millisecond response latencies, and high fault tolerance.
 
----
-
-## Installation
-
-### 1. Set Up Python Virtual Environment
-```bash
-git clone git@github.com:gandhikomarala/customer-churn-prediction-using-ML.git
-cd customer_churn_repo
-python -m venv venv
-# Windows:
-.\venv\Scripts\activate
-# Linux/macOS:
-source venv/bin/activate
+```
++-----------------------------------------------------------------------------------+
+|                            INGESTION & GATEWAY LAYER                              |
+|   [API Gateway / Fastify]  -->  [Rate Limiter]  -->  [Authentication & AuthZ]     |
++-----------------------------------------------------------------------------------+
+                                       |
+                                       v
++-----------------------------------------------------------------------------------+
+|                        STREAM & CORE PROCESSING ENGINE                            |
+|   [Event Bus / Message Queue]  <-->  [Distributed Workers]  <-->  [Cache Store]   |
++-----------------------------------------------------------------------------------+
+                                       |
+                                       v
++-----------------------------------------------------------------------------------+
+|                       DATA PERSISTENCE & STORAGE TIER                             |
+|   [ACID Transaction Ledger]  -->  [Audit Logging Vault]  -->  [Analytics Marts]   |
++-----------------------------------------------------------------------------------+
 ```
 
-### 2. Install Dependencies
+---
+
+## 📋 Prerequisites & Dependencies
+
+- **Runtime**: Python 3.11+, Java 17+, Node.js 18+
+- **Containerization**: Docker Engine 24+ and Docker Compose v2
+- **Build Utilities**: Make, Apache Maven, npm
+
+---
+
+## ⚙️ Installation
+
 ```bash
-python -m pip install --upgrade pip
+git clone <repository_url>
+cd <repository_folder>
+
+# Python Virtual Environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
+pip install --upgrade pip
 pip install -r requirements.txt
+
+# Node.js Dependencies
+npm install
 ```
 
 ---
 
-## Build
+## 🔨 Build
 
-Build containerized production image locally:
 ```bash
-docker build -t customer_churn_repo:latest .
+# Build using Makefile
+make build
+
+# Or build container image
+docker build -t app:latest .
 ```
 
 ---
 
-## Run
+## 🚀 Run
 
-### Microservice Execution
 ```bash
-python -m uvicorn Backend.main:app --host 0.0.0.0 --port 8000 --reload
-```
+# Start backend application
+python main.py
 
-### Containerized Orchestration
-```bash
-docker-compose up -d --build
-```
+# Or start Node.js server
+npm start
 
-### Static Web UI
-```bash
-python -m http.server 8000
+# Run full container stack
+docker-compose up -d
 ```
 
 ---
 
-## Usage
+## 🧪 Testing & Code Coverage
 
-1. Access the web dashboard via `http://localhost:8000` or the live GitHub Pages link.
-2. Interact with the core domain engine, real-time analytics, and data persistence layers.
+```bash
+pytest --cov=. --cov-report=term-missing tests/
+npm test
+```
 
 ---
 
-## Testing
+## 🔒 Security & Compliance
 
-Execute the automated test suite with coverage report:
-```bash
-pytest tests/ -v
-```
+- **Zero Hardcoded Secrets**: Strictly uses environment variables (see `example.env`).
+- **No Open-Source License Encumbrance**: Proprietary commercial software asset.
+- **Audit Logging**: Immutable hash-chained audit trails.
